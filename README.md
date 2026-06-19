@@ -34,7 +34,6 @@ cd ticket_booking
 
 # 2. Créer un environnement virtuel
 python -m venv venv
-source venv/bin/activate  # Linux/Mac
 venv\Scripts\activate     # Windows
 
 # 3. Installer les dépendances
