@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Réserver — {{ event.titre }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <h2 class="mb-4">
+                    <i class="bi bi-ticket-perforated"></i> Réserver des billets
+                </h2>
+
+                <!-- Résumé de l'événement -->
+                <div class="alert alert-light border">
+                    <h5>{{ event.titre }}</h5>
+                    <p class="mb-1">
+                        <i class="bi bi-calendar3"></i> {{ event.date.strftime('%d/%m/%Y à %H:%M') }}
+                    </p>
+                    <p class="mb-1">
+                        <i class="bi bi-geo-alt"></i> {{ event.lieu }}
+                    </p>
+                    <p class="mb-1">
+                        <i class="bi bi-tag"></i> Prix unitaire : 
+                        <strong>{{ "%.2f"|format(event.prix) }} $</strong>
+                    </p>
+                    <p class="mb-0">
+                        <i class="bi bi-people"></i> Places disponibles : 
+                        <strong>{{ event.places_disponibles }}</strong>
+                    </p>
+                </div>
+
+                <!-- Formulaire de sélection du nombre de places -->
+                <form method="POST" action="{{ url_for('booking.book_event', event_id=event.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="mb-3">
+                        <label for="nombre_places" class="form-label fw-bold">
+                            Nombre de places
+                        </label>
+                        <select class="form-select" id="nombre_places" name="nombre_places" 
+                                onchange="updateTotal()">
+                            <!-- ✅ CORRECTION ICI : utilisation de |min au lieu de min() -->
+                            {% set max_places = [event.places_disponibles, 10]|min %}
+                            {% for i in range(1, max_places + 1) %}
+                                <option value="{{ i }}">{{ i }} place{{ 's' if i > 1 }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Montant total calculé dynamiquement -->
+                    <div class="alert alert-success">
+                        <strong>Montant total :</strong> 
+                        <span id="total" class="fs-4 fw-bold">{{ "%.2f"|format(event.prix) }} $</span>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success flex-fill">
+                            <i class="bi bi-cart-check"></i> Procéder au paiement
+                        </button>
+                        <a href="{{ url_for('event.event_detail', event_id=event.id) }}" 
+                           class="btn btn-outline-secondary">
+                            Annuler
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script pour calculer le total dynamiquement -->
+<script>
+    const prix = {{ event.prix }};
+    function updateTotal() {
+        const nb = document.getElementById('nombre_places').value;
+        const total = (prix * nb).toFixed(2);
+        document.getElementById('total').textContent = total + ' $';
+    }
+</script>
+{% endblock %}

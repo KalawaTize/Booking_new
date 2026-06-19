@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Gestion des réservations — Admin{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">
+    <i class="bi bi-journal-bookmark"></i> Gestion des réservations
+</h2>
+
+<!-- Filtre par statut -->
+<div class="mb-3">
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{{ url_for('event.admin_bookings') }}" 
+           class="btn btn-sm {% if not selected_statut %}btn-dark{% else %}btn-outline-dark{% endif %}">
+            Toutes
+        </a>
+        <a href="{{ url_for('event.admin_bookings', statut='en_attente') }}" 
+           class="btn btn-sm {% if selected_statut == 'en_attente' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+            En attente
+        </a>
+        <a href="{{ url_for('event.admin_bookings', statut='confirme') }}" 
+           class="btn btn-sm {% if selected_statut == 'confirme' %}btn-success{% else %}btn-outline-success{% endif %}">
+            Confirmées
+        </a>
+        <a href="{{ url_for('event.admin_bookings', statut='annule') }}" 
+           class="btn btn-sm {% if selected_statut == 'annule' %}btn-danger{% else %}btn-outline-danger{% endif %}">
+            Annulées
+        </a>
+    </div>
+</div>
+
+{% if bookings.items %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Utilisateur</th>
+                    <th>Événement</th>
+                    <th>Places</th>
+                    <th>Montant</th>
+                    <th>Statut</th>
+                    <th>Date réservation</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings.items %}
+                    <tr>
+                        <td>{{ booking.id }}</td>
+                        <td>{{ booking.user.nom }}<br><small class="text-muted">{{ booking.user.email }}</small></td>
+                        <td>{{ booking.event.titre }}</td>
+                        <td>{{ booking.nombre_places }}</td>
+                        <td>{{ "%.2f"|format(booking.montant_total) }} $</td>
+                        <td>
+                            {% if booking.statut == 'confirme' %}
+                                <span class="badge bg-success">Confirmé</span>
+                            {% elif booking.statut == 'en_attente' %}
+                                <span class="badge bg-warning text-dark">En attente</span>
+                            {% else %}
+                                <span class="badge bg-danger">Annulé</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ booking.date_reservation.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td>
+                            {% if booking.statut == 'en_attente' %}
+                                <form method="POST" class="d-inline"
+                                      action="{{ url_for('event.admin_confirm_booking', booking_id=booking.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-success" title="Confirmer">
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                            {% if booking.statut != 'annule' %}
+                                <form method="POST" class="d-inline"
+                                      action="{{ url_for('event.admin_cancel_booking', booking_id=booking.id) }}"
+                                      onsubmit="return confirm('Annuler cette réservation ?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Annuler">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if bookings.pages > 1 %}
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if bookings.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('event.admin_bookings', page=bookings.prev_num, statut=selected_statut) }}">
+                            &laquo;
+                        </a>
+                    </li>
+                {% endif %}
+                {% for page_num in bookings.iter_pages() %}
+                    {% if page_num %}
+                        <li class="page-item {% if page_num == bookings.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('event.admin_bookings', page=page_num, statut=selected_statut) }}">
+                                {{ page_num }}
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                {% if bookings.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('event.admin_bookings', page=bookings.next_num, statut=selected_statut) }}">
+                            &raquo;
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+{% else %}
+    <div class="text-center py-5">
+        <p class="text-muted">Aucune réservation trouvée.</p>
+    </div>
+{% endif %}
+{% endblock %}

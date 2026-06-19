@@ -1,0 +1,126 @@
+/* ═══════════════════════════════════════════════════
+   style.css — Styles personnalisés de TicketBooking
+   ═══════════════════════════════════════════════════ */
+
+/* ─── Variables CSS ─── */
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --shadow-soft: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* ─── Global ─── */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #ffffff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* ─── Bannière héro de la page d'accueil ─── */
+.hero-section {
+    background: var(--primary-gradient);
+    box-shadow: var(--shadow-soft);
+}
+
+/* ─── Cartes d'événements ─── */
+.event-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* ─── Navbar ─── */
+.navbar {
+    padding: 0.8rem 0;
+}
+
+.navbar-brand {
+    font-size: 1.4rem;
+}
+
+/* ─── Badges de statut ─── */
+.badge {
+    font-weight: 500;
+    padding: 0.4em 0.8em;
+}
+
+/* ─── Formulaires ─── */
+.form-control:focus,
+.form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+/* ─── Boutons ─── */
+.btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #5a6fd6, #6a4299);
+    transform: translateY(-1px);
+}
+
+/* ─── Cartes du dashboard admin ─── */
+.card {
+    border-radius: 10px;
+    border: none;
+}
+
+/* ─── Footer ─── */
+footer {
+    margin-top: auto;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+    .hero-section h1 {
+        font-size: 1.8rem;
+    }
+
+    .hero-section .lead {
+        font-size: 1rem;
+    }
+
+    .navbar .input-group {
+        max-width: 100%;
+        margin: 10px 0;
+    }
+}
+
+/* ─── Animation de chargement ─── */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Table ─── */
+.table th {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.event-photo {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.event-photo:hover {
+    transform: scale(1.03);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}

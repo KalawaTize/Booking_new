@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Recherche : {{ query }} — TicketBooking{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">
+    <i class="bi bi-search"></i> Résultats pour « {{ query }} »
+</h2>
+
+{% if results and results.items %}
+    <p class="text-muted">{{ results.total }} résultat(s) trouvé(s)</p>
+
+    <div class="row g-4">
+        {% for event in results.items %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm">
+                    {% if event.image_url %}
+                        <img src="{{ event.image_url }}" class="card-img-top" alt="{{ event.titre }}"
+                             style="height: 180px; object-fit: cover;">
+                    {% else %}
+                        <div class="card-img-top bg-gradient text-white d-flex align-items-center justify-content-center"
+                             style="height: 180px; background: linear-gradient(135deg, #667eea, #764ba2);">
+                            <i class="bi bi-calendar-event" style="font-size: 3rem;"></i>
+                        </div>
+                    {% endif %}
+                    <div class="card-body d-flex flex-column">
+                        <span class="badge bg-info mb-2 align-self-start">{{ event.categorie }}</span>
+                        <h5 class="card-title">{{ event.titre }}</h5>
+                        <p class="card-text text-muted small">
+                            <i class="bi bi-calendar3"></i> {{ event.date.strftime('%d/%m/%Y à %H:%M') }}
+                        </p>
+                        <p class="card-text text-muted small">
+                            <i class="bi bi-geo-alt"></i> {{ event.lieu }}
+                        </p>
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-primary">{{ "%.2f"|format(event.prix) }} $</span>
+                                <span class="small text-muted">
+                                    {{ event.places_disponibles }} places
+                                </span>
+                            </div>
+                            <a href="{{ url_for('event.event_detail', event_id=event.id) }}" 
+                               class="btn btn-primary w-100 mt-2">Voir</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% elif query %}
+    <div class="text-center py-5">
+        <i class="bi bi-search" style="font-size: 4rem; color: #ccc;"></i>
+        <h3 class="mt-3 text-muted">Aucun résultat pour « {{ query }} »</h3>
+        <p class="text-muted">Essayez avec d'autres mots-clés.</p>
+        <a href="{{ url_for('event.index') }}" class="btn btn-primary">
+            Voir tous les événements
+        </a>
+    </div>
+{% else %}
+    <p class="text-muted">Entrez un mot-clé dans la barre de recherche.</p>
+{% endif %}
+{% endblock %}

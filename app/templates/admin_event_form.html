@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block title %}
+    {% if action == 'add' %}Ajouter{% else %}Modifier{% endif %} un événement — Admin
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <h2 class="mb-4">
+                    {% if action == 'add' %}
+                        <i class="bi bi-plus-circle"></i> Ajouter un événement
+                    {% else %}
+                        <i class="bi bi-pencil"></i> Modifier l'événement
+                    {% endif %}
+                </h2>
+
+                <form method="POST" 
+                      enctype="multipart/form-data"
+                      action="{% if action == 'add' %}{{ url_for('event.admin_add_event') }}{% else %}{{ url_for('event.admin_edit_event', event_id=event.id) }}{% endif %}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <!-- Titre -->
+                    <div class="mb-3">
+                        <label for="titre" class="form-label">Titre de l'événement *</label>
+                        <input type="text" class="form-control" id="titre" name="titre" 
+                               value="{% if action == 'edit' %}{{ event.titre }}{% elif titre is defined %}{{ titre }}{% endif %}"
+                               required>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description *</label>
+                        <textarea class="form-control" id="description" name="description" 
+                                  rows="4" required>{% if action == 'edit' %}{{ event.description }}{% elif description is defined %}{{ description }}{% endif %}</textarea>
+                    </div>
+
+                    <div class="row">
+                        <!-- Date -->
+                        <div class="col-md-6 mb-3">
+                            <label for="date" class="form-label">Date et heure *</label>
+                            <input type="datetime-local" class="form-control" id="date" name="date"
+                                   value="{% if action == 'edit' %}{{ event.date.strftime('%Y-%m-%dT%H:%M') }}{% endif %}"
+                                   required>
+                        </div>
+
+                        <!-- Lieu -->
+                        <div class="col-md-6 mb-3">
+                            <label for="lieu" class="form-label">Lieu *</label>
+                            <input type="text" class="form-control" id="lieu" name="lieu"
+                                   value="{% if action == 'edit' %}{{ event.lieu }}{% elif lieu is defined %}{{ lieu }}{% endif %}"
+                                   required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Prix -->
+                        <div class="col-md-4 mb-3">
+                            <label for="prix" class="form-label">Prix ($) *</label>
+                            <input type="number" class="form-control" id="prix" name="prix" 
+                                   step="0.01" min="0"
+                                   value="{% if action == 'edit' %}{{ event.prix }}{% elif prix is defined %}{{ prix }}{% else %}0{% endif %}"
+                                   required>
+                        </div>
+
+                        <!-- Capacité -->
+                        <div class="col-md-4 mb-3">
+                            <label for="capacite" class="form-label">Capacité totale *</label>
+                            <input type="number" class="form-control" id="capacite" name="capacite" 
+                                   min="1"
+                                   value="{% if action == 'edit' %}{{ event.capacite }}{% elif capacite is defined %}{{ capacite }}{% else %}100{% endif %}"
+                                   required>
+                        </div>
+
+                        <!-- Catégorie -->
+                        <div class="col-md-4 mb-3">
+                            <label for="categorie" class="form-label">Catégorie</label>
+                            <select class="form-select" id="categorie" name="categorie">
+                                {% set cats = ['Concert', 'Sport', 'Théâtre', 'Conférence', 'Festival', 'Cinéma', 'Autre'] %}
+                                {% for cat in cats %}
+                                    <option value="{{ cat }}" 
+                                        {% if action == 'edit' and event.categorie == cat %}selected{% endif %}
+                                        {% if categorie is defined and categorie == cat %}selected{% endif %}>
+                                        {{ cat }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- URL Image -->
+                    <div class="mb-3">
+                        <label for="image_url" class="form-label">URL de l'image (optionnel)</label>
+                        <input type="url" class="form-control" id="image_url" name="image_url"
+                               value="{% if action == 'edit' %}{{ event.image_url }}{% elif image_url is defined %}{{ image_url }}{% endif %}"
+                               placeholder="https://exemple.com/image.jpg">
+                    </div>
+
+                    <!-- Photos uploadées -->
+                    <div class="mb-3">
+                        <label for="photos" class="form-label">
+                            Photos de l'événement
+                        </label>
+
+                        <input type="file"
+                            class="form-control"
+                            id="photos"
+                            name="photos"
+                            multiple
+                            accept=".jpg,.jpeg,.png,.gif,.webp,image/*">
+
+                        <div class="form-text">
+                            Vous pouvez sélectionner plusieurs photos.
+                            Formats acceptés : JPG, JPEG, PNG, GIF, WEBP.
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-fill">
+                            <i class="bi bi-check-lg"></i> 
+                            {% if action == 'add' %}Créer l'événement{% else %}Enregistrer{% endif %}
+                        </button>
+                        <a href="{{ url_for('event.admin_events') }}" class="btn btn-outline-secondary">
+                            Annuler
+                        </a>
+                    </div>
+                </form>
+                {% if action == 'edit' and event.photos %}
+                <hr class="my-4">
+
+                <h5>
+                    <i class="bi bi-images"></i>
+                    Photos actuelles
+                </h5>
+
+                <div class="row g-3 mt-2">
+                    {% for photo in event.photos %}
+                        <div class="col-md-3">
+                            <div class="card shadow-sm">
+                                <img src="{{ url_for('static', filename='uploads/events/' ~ photo.filename) }}"
+                                    class="card-img-top"
+                                    alt="Photo événement"
+                                    style="height: 130px; object-fit: cover;">
+
+                                <div class="card-body p-2">
+                                    <form method="POST"
+                                        action="{{ url_for('event.admin_delete_event_photo', event_id=event.id, photo_id=photo.id) }}"
+                                        onsubmit="return confirm('Supprimer cette photo ?');">
+
+                                        <input type="hidden"
+                                            name="csrf_token"
+                                            value="{{ csrf_token() }}">
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-danger w-100">
+                                            <i class="bi bi-trash"></i>
+                                            Supprimer
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

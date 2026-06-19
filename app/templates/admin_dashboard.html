@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord Admin — TicketBooking{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">
+    <i class="bi bi-speedometer2"></i> Tableau de bord Administrateur
+</h2>
+
+<!-- ═══════════ CARTES STATISTIQUES ═══════════ -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white shadow">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-event fs-1"></i>
+                <h3 class="mt-2">{{ total_events }}</h3>
+                <p class="mb-0">Événements</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white shadow">
+            <div class="card-body text-center">
+                <i class="bi bi-ticket-perforated fs-1"></i>
+                <h3 class="mt-2">{{ total_bookings }}</h3>
+                <p class="mb-0">Réservations</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white shadow">
+            <div class="card-body text-center">
+                <i class="bi bi-people fs-1"></i>
+                <h3 class="mt-2">{{ total_users }}</h3>
+                <p class="mb-0">Utilisateurs</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark shadow">
+            <div class="card-body text-center">
+                <i class="bi bi-cash-coin fs-1"></i>
+                <h3 class="mt-2">{{ "%.2f"|format(revenue) }} $</h3>
+                <p class="mb-0">Revenus</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistiques des réservations par statut -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card border-success">
+            <div class="card-body text-center">
+                <span class="badge bg-success fs-6">Confirmées : {{ confirmed_bookings }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-warning">
+            <div class="card-body text-center">
+                <span class="badge bg-warning text-dark fs-6">En attente : {{ pending_bookings }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-danger">
+            <div class="card-body text-center">
+                <span class="badge bg-danger fs-6">Annulées : {{ cancelled_bookings }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ LIENS RAPIDES ═══════════ -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <a href="{{ url_for('event.admin_events') }}" class="btn btn-outline-primary w-100 py-3">
+            <i class="bi bi-calendar-plus fs-4"></i><br>Gérer les événements
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="{{ url_for('event.admin_bookings') }}" class="btn btn-outline-success w-100 py-3">
+            <i class="bi bi-journal-bookmark fs-4"></i><br>Gérer les réservations
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="{{ url_for('event.admin_add_event') }}" class="btn btn-outline-warning w-100 py-3">
+            <i class="bi bi-plus-circle fs-4"></i><br>Ajouter un événement
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Prochains événements -->
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-calendar3"></i> Prochains événements
+            </div>
+            <div class="card-body">
+                {% if upcoming_events %}
+                    <ul class="list-group list-group-flush">
+                        {% for event in upcoming_events %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ event.titre }}</strong><br>
+                                    <small class="text-muted">{{ event.date.strftime('%d/%m/%Y %H:%M') }}</small>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">
+                                    {{ event.places_disponibles }} places
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted text-center">Aucun événement à venir.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Dernières réservations -->
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-clock-history"></i> Dernières réservations
+            </div>
+            <div class="card-body">
+                {% if recent_bookings %}
+                    <ul class="list-group list-group-flush">
+                        {% for b in recent_bookings %}
+                            <li class="list-group-item">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <strong>{{ b.user.nom }}</strong> → {{ b.event.titre }}<br>
+                                        <small class="text-muted">
+                                            {{ b.nombre_places }} place(s) — {{ b.date_reservation.strftime('%d/%m/%Y') }}
+                                        </small>
+                                    </div>
+                                    {% if b.statut == 'confirme' %}
+                                        <span class="badge bg-success align-self-center">Confirmé</span>
+                                    {% elif b.statut == 'en_attente' %}
+                                        <span class="badge bg-warning text-dark align-self-center">En attente</span>
+                                    {% else %}
+                                        <span class="badge bg-danger align-self-center">Annulé</span>
+                                    {% endif %}
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted text-center">Aucune réservation récente.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}{{ event.titre }} — TicketBooking{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Image / Visuel -->
+    <div class="col-md-5 mb-4">
+        {% set cover_photo = event.photos[0] if event.photos else None %}
+
+{% if event.image_url %}
+    <img src="{{ event.image_url }}"
+         class="img-fluid rounded shadow"
+         alt="{{ event.titre }}"
+         style="width: 100%; max-height: 350px; object-fit: cover;">
+
+{% elif cover_photo %}
+    <img src="{{ url_for('static', filename='uploads/events/' ~ cover_photo.filename) }}"
+         class="img-fluid rounded shadow"
+         alt="{{ event.titre }}"
+         style="width: 100%; max-height: 350px; object-fit: cover;">
+
+{% else %}
+    <div class="rounded shadow d-flex align-items-center justify-content-center text-white"
+         style="height: 350px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <i class="bi bi-calendar-event" style="font-size: 5rem;"></i>
+    </div>
+{% endif %}
+    </div>
+
+    <!-- Détails de l'événement -->
+    <div class="col-md-7">
+        <span class="badge bg-info mb-2 fs-6">{{ event.categorie }}</span>
+        <h1 class="fw-bold">{{ event.titre }}</h1>
+
+        <div class="mb-3">
+            <p class="mb-1">
+                <i class="bi bi-calendar3 text-primary"></i> 
+                <strong>Date :</strong> {{ event.date.strftime('%A %d %B %Y à %H:%M') }}
+            </p>
+            <p class="mb-1">
+                <i class="bi bi-geo-alt text-primary"></i> 
+                <strong>Lieu :</strong> {{ event.lieu }}
+            </p>
+            <p class="mb-1">
+                <i class="bi bi-tag text-primary"></i> 
+                <strong>Prix :</strong> 
+                <span class="fs-4 fw-bold text-success">{{ "%.2f"|format(event.prix) }} $</span>
+            </p>
+            <p class="mb-1">
+                <i class="bi bi-people text-primary"></i> 
+                <strong>Places disponibles :</strong> 
+                <span class="{% if event.places_disponibles <= 5 %}text-danger fw-bold{% endif %}">
+                    {{ event.places_disponibles }} / {{ event.capacite }}
+                </span>
+            </p>
+        </div>
+
+        <hr>
+        <h4>Description</h4>
+        <p>{{ event.description }}</p>
+        {% if event.photos %}
+            <hr>
+
+            <h4>
+                <i class="bi bi-images"></i>
+                Photos de l'événement
+            </h4>
+
+            <div class="row g-3 mt-2">
+                {% for photo in event.photos %}
+                    <div class="col-md-4">
+                        <a href="{{ url_for('static', filename='uploads/events/' ~ photo.filename) }}"
+                        target="_blank">
+                            <img src="{{ url_for('static', filename='uploads/events/' ~ photo.filename) }}"
+                                class="img-fluid rounded shadow-sm event-photo"
+                                alt="{{ event.titre }}"
+                                style="height: 220px; width: 100%; object-fit: cover;">
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+                <hr>
+                <!-- Bouton de réservation -->
+                {% if event.is_past() %}
+                    <div class="alert alert-secondary">
+                        <i class="bi bi-clock-history"></i> Cet événement est déjà passé.
+                    </div>
+                {% elif not event.is_available() %}
+                    <div class="alert alert-danger">
+                        <i class="bi bi-x-circle"></i> Complet — Plus de places disponibles.
+                    </div>
+                {% else %}
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('booking.book_event', event_id=event.id) }}" 
+                        class="btn btn-success btn-lg">
+                            <i class="bi bi-ticket-perforated"></i> Réserver maintenant
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-box-arrow-in-right"></i> Connectez-vous pour réserver
+                        </a>
+                    {% endif %}
+                {% endif %}
+
+        <a href="{{ url_for('event.index') }}" class="btn btn-outline-secondary btn-lg ms-2">
+            <i class="bi bi-arrow-left"></i> Retour
+        </a>
+    </div>
+</div>
+{% endblock %}

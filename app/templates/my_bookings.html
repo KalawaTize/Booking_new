@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Mes Réservations — TicketBooking{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">
+    <i class="bi bi-journal-bookmark"></i> Mes Réservations
+</h2>
+
+{% if bookings %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Événement</th>
+                    <th>Date de l'événement</th>
+                    <th>Places</th>
+                    <th>Montant</th>
+                    <th>Statut</th>
+                    <th>Réservé le</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.id }}</td>
+                        <td>
+                            <a href="{{ url_for('event.event_detail', event_id=booking.event.id) }}">
+                                {{ booking.event.titre }}
+                            </a>
+                        </td>
+                        <td>{{ booking.event.date.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td>{{ booking.nombre_places }}</td>
+                        <td>{{ "%.2f"|format(booking.montant_total) }} $</td>
+                        <td>
+                            {% if booking.statut == 'confirme' %}
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle"></i> Confirmé
+                                </span>
+                            {% elif booking.statut == 'en_attente' %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-hourglass-split"></i> En attente
+                                </span>
+                            {% elif booking.statut == 'annule' %}
+                                <span class="badge bg-danger">
+                                    <i class="bi bi-x-circle"></i> Annulé
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>{{ booking.date_reservation.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td>
+                            {% if booking.statut == 'en_attente' %}
+                                <a href="{{ url_for('booking.payment', booking_id=booking.id) }}" 
+                                   class="btn btn-sm btn-success">
+                                    <i class="bi bi-credit-card"></i> Payer
+                                </a>
+                            {% endif %}
+                            {% if booking.statut != 'annule' %}
+                                <form method="POST" class="d-inline"
+                                      action="{{ url_for('booking.cancel_booking', booking_id=booking.id) }}"
+                                      onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette réservation ?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-x-lg"></i> Annuler
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-journal-x" style="font-size: 4rem; color: #ccc;"></i>
+        <h3 class="mt-3 text-muted">Aucune réservation</h3>
+        <p class="text-muted">Vous n'avez pas encore de réservation.</p>
+        <a href="{{ url_for('event.index') }}" class="btn btn-primary">
+            <i class="bi bi-search"></i> Parcourir les événements
+        </a>
+    </div>
+{% endif %}
+{% endblock %}

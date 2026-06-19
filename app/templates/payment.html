@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Paiement — TicketBooking{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <h2 class="text-center mb-4">
+                    <i class="bi bi-credit-card"></i> Paiement sécurisé
+                </h2>
+
+                <!-- Résumé de la commande -->
+                <div class="alert alert-info">
+                    <h6 class="mb-1">Résumé de la commande</h6>
+                    <p class="mb-0">
+                        <strong>{{ booking.event.titre }}</strong><br>
+                        {{ booking.nombre_places }} place(s) × {{ "%.2f"|format(booking.event.prix) }} $
+                    </p>
+                    <hr class="my-2">
+                    <p class="mb-0 fs-5">
+                        <strong>Total : {{ "%.2f"|format(booking.montant_total) }} $</strong>
+                    </p>
+                </div>
+
+                <div class="alert alert-warning small">
+                    <i class="bi bi-shield-lock"></i> 
+                    <strong>Mode simulation :</strong> 
+                    Ceci est une simulation de paiement. Aucune transaction réelle ne sera effectuée.
+                    Utilisez le numéro de carte : <code>4242 4242 4242 4242</code>
+                </div>
+
+                <!-- Formulaire de paiement (simulation) -->
+                <form method="POST" action="{{ url_for('booking.payment', booking_id=booking.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <!-- Numéro de carte -->
+                    <div class="mb-3">
+                        <label for="card_number" class="form-label">Numéro de carte</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-credit-card"></i></span>
+                            <input type="text" class="form-control" id="card_number" name="card_number"
+                                   placeholder="4242 4242 4242 4242" maxlength="19" required>
+                        </div>
+                    </div>
+
+                    <!-- Nom sur la carte -->
+                    <div class="mb-3">
+                        <label for="card_name" class="form-label">Nom sur la carte</label>
+                        <input type="text" class="form-control" id="card_name" name="card_name"
+                               placeholder="JEAN DUPONT" required>
+                    </div>
+
+                    <div class="row">
+                        <!-- Date d'expiration -->
+                        <div class="col-6 mb-3">
+                            <label for="expiry" class="form-label">Expiration</label>
+                            <input type="text" class="form-control" id="expiry" name="expiry"
+                                   placeholder="MM/AA" maxlength="5" required>
+                        </div>
+                        <!-- CVV -->
+                        <div class="col-6 mb-3">
+                            <label for="cvv" class="form-label">CVV</label>
+                            <input type="text" class="form-control" id="cvv" name="cvv"
+                                   placeholder="123" maxlength="4" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 btn-lg">
+                        <i class="bi bi-lock"></i> Payer {{ "%.2f"|format(booking.montant_total) }} $
+                    </button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <small class="text-muted">
+                        <i class="bi bi-shield-check"></i> 
+                        Transaction sécurisée — Vos données sont protégées
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
