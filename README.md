@@ -1,8 +1,8 @@
-# 🎫 TicketBooking — Système de Réservation de Billets
+TicketBooking — Système de Réservation de Billets
 
 Application web de réservation de billets pour événements, développée avec **Python/Flask**.
 
-## 📋 Fonctionnalités
+## Fonctionnalités
 
 ### Utilisateurs
 - Inscription et connexion sécurisées (bcrypt)
@@ -19,13 +19,13 @@ Application web de réservation de billets pour événements, développée avec 
 - Gestion des réservations (confirmer, annuler)
 - Visualisation de toutes les données
 
-## 🛠 Technologies
+## Technologies
 - **Backend** : Python 3, Flask, Flask-SQLAlchemy, Flask-Login, Flask-Bcrypt
 - **Frontend** : HTML5, CSS3, Bootstrap 5, Jinja2
 - **Base de données** : SQLite
 - **Sécurité** : CSRF (Flask-WTF), hachage bcrypt, validation des formulaires
 
-## 🚀 Installation
+## Installation
 
 ```bash
 # 1. Cloner le dépôt
