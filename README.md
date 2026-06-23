@@ -29,12 +29,12 @@ Application web de réservation de billets pour événements, développée avec 
 
 ```bash
 # 1. Cloner le dépôt
-git clone https://github.com/votre-repo/ticket_booking.git
-cd ticket_booking
+git clone https://github.com/votre-repo/Booking_new.git
+cd Booking_new
 
 # 2. Créer un environnement virtuel
-python -m venv venv
-venv\Scripts\activate     # Windows
+python -m venv .venv
+.\.venv\Scripts\activate     # Windows
 
 # 3. Installer les dépendances
 pip install -r requirements.txt
