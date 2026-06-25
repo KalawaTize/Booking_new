@@ -1,4 +1,8 @@
 TicketBooking — Système de Réservation de Billets
+## Projet réalisé par :
+- Claude Kalawa TIZE
+- Fred Cédric ISSOLA
+- Wilson N’kalla Ebouli Oyama
 
 Application web de réservation de billets pour événements, développée avec **Python/Flask**.
 
